@@ -1,4 +1,4 @@
-package com.revature.spring_mvc.config;
+package com.revature.jash.config;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
