@@ -3,7 +3,7 @@ import java.util.List;
 
 public class Question {
     private String Question;
-    private String Answer;
+    private String Answer; // TODO : may want to remove this , but for now i will leave it in
     private String Category; // the type of question (comedy , movie , art etc..)
     private int difficultyLevel;// (between 0 - 4) this property describes how hard the question is to the average person
     private float pointValue; // (between 100 - 9999) this property denotes the amount of points this question is worth , if answered correctly
