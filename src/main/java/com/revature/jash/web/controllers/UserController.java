@@ -19,6 +19,11 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping(value = "test", produces = "application/json")
+    public String test() {
+        return "HIT IT";
+    }
+
     @GetMapping(produces = "application/json")
     public List<UserDTO> getAllUsers() {
         return userService.findAll();
