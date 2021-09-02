@@ -22,7 +22,7 @@ public class JwtConfig {
     private String secret;
 
     @Value("${jwt.expiration}")
-    private String expiration;
+    private int expiration;
 
     private SignatureAlgorithm sigAlg = SignatureAlgorithm.HS256;
     private Key signingKey;
@@ -46,7 +46,7 @@ public class JwtConfig {
         return secret;
     }
 
-    public String getExpiration() {
+    public int getExpiration() {
         return expiration;
     }
 
