@@ -23,7 +23,7 @@ import java.util.Base64;
 @Component
 public class PasswordUtils {
 
-    @Value("${salt}")
+    @Value("${encrypt.salt}")
     private String salt;
 
     /**

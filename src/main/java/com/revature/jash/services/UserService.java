@@ -12,7 +12,6 @@ import com.revature.jash.web.dtos.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,14 +40,9 @@ public class UserService {
             throw new InvalidRequestException("Invalid id provided");
         }
 
-        User user = userRepo.findById(id);
-
-        if (user == null) {
-            throw new ResourceNotFoundException();
-        }
-
-        return new UserDTO(user);
-
+        return userRepo.findById(id)
+                .map(UserDTO::new)
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     public User register(User newUser) {
@@ -79,7 +73,7 @@ public class UserService {
         }
 
         String encryptedPassword = passwordUtils.generateSecurePassword(password);
-        User authUser = userRepo.findUserByCredentials(username, encryptedPassword);
+        User authUser = userRepo.findUserByUsernameAndPassword(username, encryptedPassword);
 
         if (authUser == null) {
             throw new AuthenticationException("Invalid credentials provided!");
@@ -87,6 +81,14 @@ public class UserService {
 
         return new Principal(authUser);
 
+    }
+
+    public void deleteById(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new InvalidRequestException("Invalid id provided");
+        }
+
+        userRepo.deleteById(id);
     }
 
     public boolean isUsernameAvailable(String username) {

@@ -4,9 +4,11 @@ import com.revature.jash.datasource.documents.User;
 import com.revature.jash.services.UserService;
 import com.revature.jash.web.dtos.UserDTO;
 import com.revature.jash.web.dtos.Principal;
+import com.revature.jash.web.util.security.Secured;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -19,25 +21,28 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping(value = "test", produces = "application/json")
-    public String test() {
-        return "HIT IT";
-    }
-
     @GetMapping(produces = "application/json")
+    @Secured(allowedUsers = {})
     public List<UserDTO> getAllUsers() {
         return userService.findAll();
     }
 
     @GetMapping(value = "{id}", produces = "application/json")
+    @Secured(allowedUsers = {})
     public UserDTO getUserById(@PathVariable String id) {
         return userService.findUserById(id);
     }
 
-    @PostMapping
+    @PostMapping(produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public Principal registerNewUser(@RequestBody User newUser) {
+    public Principal registerNewUser(@RequestBody @Valid User newUser) {
         return new Principal(userService.register(newUser));
+    }
+
+    @DeleteMapping(value = "{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteUser(@PathVariable String id) {
+        userService.deleteById(id);
     }
 
 }
