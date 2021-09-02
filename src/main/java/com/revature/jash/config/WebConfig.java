@@ -27,7 +27,7 @@ public class WebConfig implements WebApplicationInitializer {
         container.register(AppConfig.class);
         servletContext.addListener(new ContextLoaderListener(container));
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("DispatcherServlet", new DispatcherServlet(container));
-   //     dispatcher.setLoadOnStartup(1);
+        dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/");
 
         configureLogback(servletContext);
