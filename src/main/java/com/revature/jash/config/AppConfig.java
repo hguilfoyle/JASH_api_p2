@@ -15,7 +15,7 @@ import javax.servlet.ServletRegistration;
 
 @EnableWebMvc
 @Configuration
-@ComponentScan("com.revature.spring_mvc")
+@ComponentScan("com.revature.jash")
 public class AppConfig implements WebMvcConfigurer, WebApplicationInitializer {
 
 
