@@ -6,4 +6,9 @@
 
     <display-name>you-dont-know-JASH</display-name>
 
+    <context-param>
+        <param-name>logback-config</param-name>
+        <param-value>WEB-INF/classes/logback.xml</param-value>
+    </context-param>
+
 </web-app>

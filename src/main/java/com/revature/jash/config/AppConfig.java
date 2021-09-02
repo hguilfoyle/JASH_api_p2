@@ -2,6 +2,7 @@ package com.revature.jash.config;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -15,19 +16,8 @@ import javax.servlet.ServletRegistration;
 
 @EnableWebMvc
 @Configuration
-@ComponentScan("com.revature.spring_mvc")
-public class AppConfig implements WebMvcConfigurer, WebApplicationInitializer {
+@ComponentScan("com.revature.jash")
+@Import({AspectConfig.class, WebConfig.class, DataConfig.class})
+public class AppConfig {
 
-
-    @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
-        AnnotationConfigWebApplicationContext container = new AnnotationConfigWebApplicationContext();
-        container.register(AppConfig.class);
-
-        servletContext.addListener(new ContextLoaderListener(container));
-
-        ServletRegistration.Dynamic dispatcher = servletContext.addServlet("DispatcherServlet", new DispatcherServlet(container));
-        dispatcher.setLoadOnStartup(1);
-        dispatcher.addMapping("/");
-    }
 }
