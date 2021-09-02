@@ -11,6 +11,9 @@ public class Question {
     private float multiplier; // (between 0.01 - 3.5) this property is a factor that we can use
     private List<String> hints; // TODO : may want to remove this , but for now i will leave it in
 
+    //for jakson
+    public Question(){}
+
     public Question(String question, String answer, String category, int difficultyLevel) {
         Question = question;
         Answer = answer;
