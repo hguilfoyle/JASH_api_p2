@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -40,7 +41,8 @@ public class UserController {
 
     @PostMapping(produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public Principal registerNewUser(@RequestBody @Valid User newUser) {
+    public Principal registerNewUser(@RequestBody @Valid User newUser, HttpServletResponse resp) {
+        resp.setHeader("Access-Control-Expose-Headers", "Authorization");
         return new Principal(userService.register(newUser));
     }
 
