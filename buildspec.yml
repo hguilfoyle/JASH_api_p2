@@ -15,5 +15,5 @@ phases:
 artifacts:
   files:
     - target/jash-1.0-SNAPSHOT.jar
-    - application.yml
+    - appspec.yml
   discard-paths: yes
