@@ -11,14 +11,12 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - mvn package
-      - mv target/*.jar ./Project_2.jar
+      - mvn install
   post_build:
     commands:
       - echo Build completed on `date`
-      - Project_2.jar -d artifact/
 
 artifacts:
   files:
-    - target/Project_2.jar
+    - target/jash-1.0-SNAPSHOT.jar
   name: artifact
