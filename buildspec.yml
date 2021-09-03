@@ -4,18 +4,16 @@ phases:
   install:
     runtime-versions:
       java: corretto8
-  pre_build:
-    commands:
-#      - aws s3 cp s3://ahjsp2/application.properties ./src/main/resources/application.properties
-
   build:
     commands:
       - echo Build started on `date`
-      - mvn package
+      - mvn test
   post_build:
     commands:
       - echo Build completed on `date`
-
+      - mvn package
 artifacts:
   files:
-    - target/jash-1.0-SNAPSHOT.jar
+    - target/jash-SNAPSHOT.jar
+    - application.yml
+  discard-paths: yes
