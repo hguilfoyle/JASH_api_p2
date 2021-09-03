@@ -4,15 +4,20 @@ import com.revature.jash.datasource.documents.User;
 import com.revature.jash.services.UserService;
 import com.revature.jash.web.dtos.UserDTO;
 import com.revature.jash.web.dtos.Principal;
+import com.revature.jash.web.filters.CorsFilter;
 import com.revature.jash.web.util.security.Secured;
+import org.springframework.boot.actuate.endpoint.annotation.FilteredEndpoint;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.annotation.WebFilter;
 import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@CrossOrigin
 public class UserController {
 
     private final UserService userService;
