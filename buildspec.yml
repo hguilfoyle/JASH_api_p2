@@ -6,7 +6,7 @@ phases:
       java: corretto8
   pre_build:
     commands:
-#      - aws s3 cp s3://ahjsp2/application.yml ./src/main/resources/application.yml
+      - aws s3 cp s3://ahjsp2/application.yml ./src/main/resources/application.yml
   build:
     commands:
       - echo Build started on `date`
@@ -18,5 +18,4 @@ phases:
 artifacts:
   files:
     - target/jash-1.0-SNAPSHOT.jar
-    - appspec.yml
   discard-paths: yes
