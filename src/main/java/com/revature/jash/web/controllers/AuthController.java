@@ -6,6 +6,7 @@ import com.revature.jash.web.dtos.Principal;
 import com.revature.jash.web.util.security.Secured;
 import com.revature.jash.web.util.security.TokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +15,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin
+@Component
 public class AuthController {
 
     private final UserService userService;

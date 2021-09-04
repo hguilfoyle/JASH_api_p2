@@ -1,5 +1,7 @@
 package com.revature.jash.web.filters;
 
+import org.springframework.stereotype.Component;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebFilter;
@@ -9,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebFilter("/*")
+@Component
 public class CorsFilter extends HttpFilter {
 
     @Override
