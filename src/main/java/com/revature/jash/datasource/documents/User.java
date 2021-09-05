@@ -9,6 +9,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Data
@@ -34,6 +36,9 @@ public class User {
 
     @NotBlank(message = "Password cannot be null or blank")
     private String password;
+
+    private List<Collection> collections = new ArrayList<>();
+    private List<Collection> favorites = new ArrayList<>();
 
     public User(String id, String firstName, String lastName, String email, String username, String password){
         this.firstName = firstName;

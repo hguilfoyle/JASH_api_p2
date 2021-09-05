@@ -1,5 +1,6 @@
 package com.revature.jash.services;
 
+import com.revature.jash.datasource.documents.Collection;
 import com.revature.jash.datasource.documents.User;
 import com.revature.jash.datasource.repositories.UserRepository;
 import com.revature.jash.util.PasswordUtils;
@@ -12,6 +13,7 @@ import com.revature.jash.web.dtos.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLOutput;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,6 +91,20 @@ public class UserService {
         }
 
         userRepo.deleteById(id);
+    }
+
+    public void addCollection(Collection newCollection) {
+        Principal authorPrincipal = newCollection.getAuthor();
+        User author = userRepo.findById(authorPrincipal.getId()).orElseThrow(ResourceNotFoundException::new);;
+
+        for(Collection c : author.getCollections()) {
+            if(c.getId().equals(newCollection.getId())) {
+                return;
+            }
+        }
+
+        author.getCollections().add(newCollection);
+        userRepo.save(author);
     }
 
     public boolean isUsernameAvailable(String username) {

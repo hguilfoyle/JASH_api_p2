@@ -15,12 +15,10 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/questions")
-@CrossOrigin
 public class QuestionController {
 
-        private final QuestionService questionService;
-
-        public QuestionController(QuestionService questionService){
+    private final QuestionService questionService;
+    public QuestionController(QuestionService questionService){
             this.questionService = questionService;
         }
 
@@ -29,5 +27,14 @@ public class QuestionController {
     public Question createQuestion(@RequestBody @Valid Question newQuestion){
             return questionService.createNewQuestion(newQuestion);
     }
+
+    @GetMapping(produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public Question findById(@PathVariable String id) {
+        return questionService.findQuestionById(id);
+    }
+
+
+
 
 }
