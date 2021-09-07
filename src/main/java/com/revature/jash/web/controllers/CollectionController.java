@@ -29,4 +29,16 @@ public class CollectionController {
         return collectionService.findCollectionById(id);
     }
 
+    @PutMapping(produces = "application/json", consumes = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection replaceCollection(@RequestBody @Valid Collection updatedCollection) {
+        return collectionService.replaceCollection(updatedCollection);
+    }
+
+    @DeleteMapping(value = "{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteCollection(@PathVariable String id) {
+        collectionService.deleteCollectionById(id);
+    }
+
 }
