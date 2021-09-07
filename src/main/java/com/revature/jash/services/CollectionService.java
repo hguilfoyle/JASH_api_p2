@@ -37,7 +37,7 @@ public class CollectionService {
 
     public Collection createNewCollection(Collection newCollection) {
         if(!isValid(newCollection)) {
-            throw new InvalidRequestException("Invalid Question");
+            throw new InvalidRequestException("Invalid Collection");
         }
 
         if(!isUnique(newCollection)) {
@@ -51,6 +51,7 @@ public class CollectionService {
         userService.addCollection(newCollection);
         return newCollection;
     }
+
 
     public void deleteById(String id) {
         Collection toDelete = collectionRepo.findCollectionById(id);
@@ -74,6 +75,23 @@ public class CollectionService {
         //Finally, delete the collection.
         collectionRepo.deleteById(id);
     }
+
+    /**
+     *  Takes in a collection with updated information ie. Title, Questions, Description and replaces the existing
+     *  collection in the database with the newly updated Collection.
+     *
+     * @param updatedCollection
+     * @return
+     */
+    public Collection replaceCollection(Collection updatedCollection) {
+        if (!isValid(updatedCollection)) {
+            throw new InvalidRequestException("Invalid Collection");
+        }
+
+        updatedCollection = collectionRepo.save(updatedCollection);
+
+        return updatedCollection;
+    }        
 
     public boolean isUnique(Collection collection) {
         List<Collection> bySameAuthor = collectionRepo.findCollectionByAuthor(collection.getAuthor());
