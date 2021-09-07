@@ -1,8 +1,11 @@
 package com.revature.jash.web.dtos;
 
+import com.revature.jash.datasource.documents.Collection;
 import com.revature.jash.datasource.documents.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class UserDTO {
@@ -13,12 +16,17 @@ public class UserDTO {
     private String email;
     private String username;
 
+    private List<Collection> collections = new ArrayList<>();
+    private List<Collection> favorites = new ArrayList<>();
+
     public UserDTO(User subject) {
         this.id = subject.getId();
         this.firstName = subject.getFirstName();
         this.lastName = subject.getLastName();
         this.email = subject.getEmail();
         this.username = subject.getUsername();
+        this.collections = subject.getCollections();
+        this.favorites = subject.getFavorites();
     }
 
     public String getId() {
@@ -61,28 +69,45 @@ public class UserDTO {
         this.username = username;
     }
 
+    public List<Collection> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(List<Collection> collections) {
+        this.collections = collections;
+    }
+
+    public List<Collection> getFavorites() {
+        return favorites;
+    }
+
+    public void setFavorites(List<Collection> favorites) {
+        this.favorites = favorites;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UserDTO that = (UserDTO) o;
-        return Objects.equals(id, that.id) && Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(email, that.email) && Objects.equals(username, that.username);
+        UserDTO userDTO = (UserDTO) o;
+        return Objects.equals(id, userDTO.id) && Objects.equals(firstName, userDTO.firstName) && Objects.equals(lastName, userDTO.lastName) && Objects.equals(email, userDTO.email) && Objects.equals(username, userDTO.username) && Objects.equals(collections, userDTO.collections) && Objects.equals(favorites, userDTO.favorites);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, email, username);
+        return Objects.hash(id, firstName, lastName, email, username, collections, favorites);
     }
 
     @Override
     public String toString() {
-        return "AppUserDTO{" +
+        return "UserDTO{" +
                 "id='" + id + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", username='" + username + '\'' +
+                ", collections=" + collections +
+                ", favorites=" + favorites +
                 '}';
     }
-
 }
