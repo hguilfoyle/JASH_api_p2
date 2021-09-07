@@ -60,7 +60,7 @@ public class UserService {
         }
 
         if (userRepo.findUserByEmail(newUser.getEmail()) != null) {
-            throw new ResourcePersistenceException("Provided username is already taken!");
+            throw new ResourcePersistenceException("Provided email is already taken!");
         }
 
         String encryptedPassword = passwordUtils.generateSecurePassword(newUser.getPassword());
@@ -104,6 +104,7 @@ public class UserService {
             and specific endpoint.
             Collections should be Created and Deleted through the collections endpoint, not through a User Update
          */
+
         toSave.setFirstName(user.getFirstName());
         toSave.setLastName(user.getLastName());
         toSave.setEmail(user.getEmail());
