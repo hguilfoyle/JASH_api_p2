@@ -93,6 +93,19 @@ public class UserService {
         userRepo.deleteById(id);
     }
 
+    public void update(User user) {
+        User toSave = userRepo.findById(user.getId()).orElseThrow(ResourceNotFoundException::new);
+
+        //Update each field, CANNOT UPDATE USERNAME OR PASSWORD
+        toSave.setFirstName(user.getFirstName());
+        toSave.setLastName(user.getLastName());
+        toSave.setEmail(user.getEmail());
+        toSave.setFavorites(user.getFavorites());
+        toSave.setCollections(user.getCollections());
+
+        userRepo.save(user);
+    }
+
     public void addCollection(Collection newCollection) {
         Principal authorPrincipal = newCollection.getAuthor();
         User author = userRepo.findById(authorPrincipal.getId()).orElseThrow(ResourceNotFoundException::new);;
