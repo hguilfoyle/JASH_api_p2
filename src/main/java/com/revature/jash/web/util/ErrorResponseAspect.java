@@ -3,6 +3,7 @@ package com.revature.jash.web.util;
 import com.revature.jash.util.exceptions.InvalidRequestException;
 import com.revature.jash.util.exceptions.ResourceNotFoundException;
 import com.revature.jash.util.exceptions.ResourcePersistenceException;
+import com.revature.jash.util.exceptions.UserForbiddenException;
 import com.revature.jash.web.dtos.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -12,6 +13,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ErrorResponseAspect {
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleUserForbiddenException(UserForbiddenException e) {
+        return new ErrorResponse(403, e.getMessage());
+    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)

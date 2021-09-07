@@ -2,6 +2,7 @@ package com.revature.jash.services;
 
 import com.revature.jash.datasource.documents.Collection;
 import com.revature.jash.datasource.documents.User;
+import com.revature.jash.datasource.repositories.CollectionRepository;
 import com.revature.jash.datasource.repositories.UserRepository;
 import com.revature.jash.util.PasswordUtils;
 import com.revature.jash.util.exceptions.AuthenticationException;
@@ -22,13 +23,13 @@ public class UserService {
 
     private final UserRepository userRepo;
     private final PasswordUtils passwordUtils;
-    private final CollectionService collectionService;
+    private final CollectionRepository collectionRepo;
 
     @Autowired
-    public UserService(UserRepository userRepo, PasswordUtils passwordUtils, CollectionService collectionService) {
+    public UserService(UserRepository userRepo, CollectionRepository collectionRepo, PasswordUtils passwordUtils) {
         this.userRepo = userRepo;
+        this.collectionRepo = collectionRepo;
         this.passwordUtils = passwordUtils;
-        this.collectionService = collectionService;
     }
 
     public List<UserDTO> findAll() {
@@ -87,9 +88,27 @@ public class UserService {
 
     }
 
+    //This makes me sad, but it should work.
     public void deleteById(String id) {
         if (id == null || id.trim().isEmpty()) {
             throw new InvalidRequestException("Invalid id provided");
+        }
+
+        User user = userRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
+
+        //Maintain referential integrity
+        for(Collection c : user.getCollections()) {
+            //Need to remove collection from all Users favorites
+            List<User> withFavorite = userRepo.findByFavoritesContaining(c); //Need to test this line!!!
+            for(User u : withFavorite) {
+                List<Collection> favorites = u.getFavorites();
+                favorites.remove(c);
+                u.setFavorites(favorites);
+                userRepo.save(u);
+            }
+
+            //Finally, delete the collection.
+            collectionRepo.deleteById(id);
         }
 
         userRepo.deleteById(id);

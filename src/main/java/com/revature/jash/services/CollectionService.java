@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CollectionService {
@@ -28,11 +29,48 @@ public class CollectionService {
         this.userRepo = userRepo;
     }
 
-    //Hoping that save updates instead of making a whole new thing
+    public List<Collection> findAll() {
+        return collectionRepo.findAll()
+                .stream()
+                .collect(Collectors.toList());
+    }
+
     public void addQuestionToCollection(Question question) {
         Collection collection = collectionRepo.findCollectionById(question.getCollection_id());
         collection.getQuestionList().add(question);
         collectionRepo.save(collection);
+
+        //Need to maintain referential integrity
+        //Update the Owner's Collections field with the new Question
+        Collection owner = collectionRepo.findCollectionById(question.getCollection_id());
+        User author = userRepo.findById(owner.getAuthor().getId()).orElseThrow(ResourceNotFoundException::new);
+        List<Collection> collections = author.getCollections();
+        for(Collection c : collections) {
+            if(c.getId().equals(question.getCollection_id())) {
+                List<Question> qList = c.getQuestionList();
+                qList.add(question);
+                c.setQuestionList(qList);
+                break;
+            }
+        }
+        author.setCollections(collections);
+        userRepo.save(author);
+
+        //Update all Users' Favorites with the updated Question
+        List<User> usersWithQuestion = userRepo.findByFavoritesContaining(question); //Need to test this line!!!
+        for(User u : usersWithQuestion) {
+            collections = u.getCollections();
+            for(Collection c : collections) {
+                if(c.getId().equals(question.getCollection_id())) {
+                    List<Question> qList = c.getQuestionList();
+                    qList.add(question);
+                    c.setQuestionList(qList);
+                    break;
+                }
+            }
+            author.setCollections(collections);
+            userRepo.save(author);
+        }
     }
 
     public Collection createNewCollection(Collection newCollection) {
