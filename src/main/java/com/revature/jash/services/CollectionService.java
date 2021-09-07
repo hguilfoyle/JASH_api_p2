@@ -5,9 +5,11 @@ import com.revature.jash.datasource.documents.Question;
 import com.revature.jash.datasource.documents.User;
 import com.revature.jash.datasource.repositories.CollectionRepository;
 import com.revature.jash.datasource.repositories.QuestionRepository;
+import com.revature.jash.datasource.repositories.UserRepository;
 import com.revature.jash.util.exceptions.DuplicateResourceException;
 import com.revature.jash.util.exceptions.InvalidRequestException;
 import com.revature.jash.util.exceptions.ResourceNotFoundException;
+import com.revature.jash.web.dtos.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +18,14 @@ import java.util.List;
 @Service
 public class CollectionService {
     private final CollectionRepository collectionRepo;
+    private final UserRepository userRepo;
     private final UserService userService;
 
     @Autowired
-    public CollectionService(CollectionRepository collectionRepository, UserService userService){
+    public CollectionService(CollectionRepository collectionRepository, UserService userService, UserRepository userRepo){
         this.collectionRepo = collectionRepository;
         this.userService = userService;
+        this.userRepo = userRepo;
     }
 
     //Hoping that save updates instead of making a whole new thing
@@ -46,6 +50,29 @@ public class CollectionService {
 
         userService.addCollection(newCollection);
         return newCollection;
+    }
+
+    public void deleteById(String id) {
+        Collection toDelete = collectionRepo.findCollectionById(id);
+
+        //Need to remove collection from the Author's collections
+        User author = userRepo.findById(toDelete.getAuthor().getId()).orElseThrow(ResourceNotFoundException::new);
+        List<Collection> collections = author.getCollections();
+        collections.remove(toDelete);
+        author.setCollections(collections);
+        userRepo.save(author);
+
+        //Need to remove collection from all Users favorites
+        List<User> withFavorite = userRepo.findByFavoritesContaining(toDelete); //Need to test this line!!!
+        for(User u : withFavorite) {
+            List<Collection> favorites = author.getFavorites();
+            favorites.remove(toDelete);
+            author.setFavorites(favorites);
+            userRepo.save(author);
+        }
+
+        //Finally, delete the collection.
+        collectionRepo.deleteById(id);
     }
 
     public boolean isUnique(Collection collection) {

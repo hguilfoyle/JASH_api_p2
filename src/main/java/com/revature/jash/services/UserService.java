@@ -104,6 +104,7 @@ public class UserService {
             and specific endpoint.
             Collections should be Created and Deleted through the collections endpoint, not through a User Update
          */
+
         toSave.setFirstName(user.getFirstName());
         toSave.setLastName(user.getLastName());
         toSave.setEmail(user.getEmail());
