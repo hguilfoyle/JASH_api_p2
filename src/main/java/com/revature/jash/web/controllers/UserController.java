@@ -51,4 +51,9 @@ public class UserController {
         userService.deleteById(id);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    public void updateUser(@RequestBody @Valid User updatedUser) {
+        userService.update(updatedUser);
+    }
+
 }

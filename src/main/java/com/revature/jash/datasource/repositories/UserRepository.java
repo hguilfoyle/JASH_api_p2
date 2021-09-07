@@ -1,8 +1,11 @@
 package com.revature.jash.datasource.repositories;
 
+import com.revature.jash.datasource.documents.Collection;
 import com.revature.jash.datasource.documents.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 
 @Repository
@@ -13,5 +16,6 @@ public interface UserRepository extends MongoRepository<User, String> {
     User findUserByUsername(String username);
     User findUserByEmail(String email);
 
+    List<User> findByFavoritesContaining(Collection toDelete);
 }
 
