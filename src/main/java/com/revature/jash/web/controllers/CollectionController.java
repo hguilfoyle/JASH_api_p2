@@ -23,12 +23,6 @@ public class CollectionController {
         return collectionService.createNewCollection(newCollection);
     }
 
-    @DeleteMapping()
-    @ResponseStatus(HttpStatus.OK)
-    public void deleteCollection(@PathVariable String id) {
-        collectionService.deleteById(id);
-    }
-
     @GetMapping(produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public Collection findById(@PathVariable String id) {
@@ -44,7 +38,7 @@ public class CollectionController {
     @DeleteMapping(value = "{id}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteCollection(@PathVariable String id) {
-        collectionService.deleteCollectionById(id);
+        collectionService.deleteById(id);
     }
 
 }
