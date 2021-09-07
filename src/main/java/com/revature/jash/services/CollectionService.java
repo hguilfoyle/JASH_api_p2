@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CollectionService {
@@ -26,6 +27,12 @@ public class CollectionService {
         this.collectionRepo = collectionRepository;
         this.userService = userService;
         this.userRepo = userRepo;
+    }
+
+    public List<Collection> findAll() {
+        return collectionRepo.findAll()
+                .stream()
+                .collect(Collectors.toList());
     }
 
     //Hoping that save updates instead of making a whole new thing

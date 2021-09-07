@@ -4,10 +4,13 @@ import com.revature.jash.datasource.documents.Collection;
 import com.revature.jash.datasource.documents.Question;
 import com.revature.jash.services.CollectionService;
 import com.revature.jash.services.QuestionService;
+import com.revature.jash.web.dtos.UserDTO;
+import com.revature.jash.web.util.security.Secured;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/collections")
@@ -17,13 +20,19 @@ public class CollectionController {
         this.collectionService = collectionService;
     }
 
+    @GetMapping(produces = "application/json")
+    @Secured(allowedUsers = {})
+    public List<Collection> getAllUsers() {
+        return collectionService.findAll();
+    }
+
     @PostMapping(produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public Collection createCollection(@RequestBody @Valid Collection newCollection){
         return collectionService.createNewCollection(newCollection);
     }
 
-    @GetMapping(produces = "application/json")
+    @GetMapping(value = "{id}",produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public Collection findById(@PathVariable String id) {
         return collectionService.findCollectionById(id);

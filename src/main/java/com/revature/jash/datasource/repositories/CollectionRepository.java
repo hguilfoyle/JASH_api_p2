@@ -1,6 +1,7 @@
 package com.revature.jash.datasource.repositories;
 
 import com.revature.jash.datasource.documents.Collection;
+import com.revature.jash.datasource.documents.Question;
 import com.revature.jash.datasource.documents.User;
 import com.revature.jash.web.dtos.Principal;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -16,4 +17,6 @@ public interface CollectionRepository extends MongoRepository<Collection, String
     Collection findCollectionById(String id);
     List<Collection> findCollectionByAuthor(Principal author);
     Collection findCollectionByCategory(String category);
+
+    List<Collection> findByQuestionListContaining(Question question);
 }

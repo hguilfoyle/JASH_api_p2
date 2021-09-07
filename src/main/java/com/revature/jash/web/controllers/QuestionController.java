@@ -28,13 +28,23 @@ public class QuestionController {
             return questionService.createNewQuestion(newQuestion);
     }
 
-    @GetMapping(produces = "application/json")
+    @GetMapping(value = "{id}", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public Question findById(@PathVariable String id) {
         return questionService.findQuestionById(id);
     }
 
+    @DeleteMapping(value = "{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteQuestion(@PathVariable String id) {
+        questionService.deleteById(id);
+    }
 
+    @PutMapping(value = "{id}", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public Question updateQuestion(@RequestBody @Valid Question updatedQuestion) {
+        return questionService.update(updatedQuestion);
+    }
 
 
 }
