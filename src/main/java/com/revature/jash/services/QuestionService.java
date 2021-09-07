@@ -62,15 +62,20 @@ public class QuestionService {
         collectionRepo.save(owner);
 
         User author = userRepo.findById(owner.getAuthor().getId()).orElseThrow(ResourceNotFoundException::new);
+        System.out.println(author);
         List<Collection> collections = author.getCollections();
-        collections.remove(toDelete);
+        for(Collection c : collections) {
+            c.getQuestionList().remove(toDelete);
+        }
         author.setCollections(collections);
         userRepo.save(author);
 
         List<User> usersWithQuestion = userRepo.findByFavoritesContaining(toDelete); //Need to test this line!!!
         for(User u : usersWithQuestion) {
             collections = u.getFavorites();
-            collections.remove(toDelete);
+            for(Collection c : collections) {
+                c.getQuestionList().remove(toDelete);
+            }
             u.setFavorites(collections);
             userRepo.save(u);
         }
