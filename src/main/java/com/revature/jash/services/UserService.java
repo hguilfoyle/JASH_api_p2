@@ -22,11 +22,13 @@ public class UserService {
 
     private final UserRepository userRepo;
     private final PasswordUtils passwordUtils;
+    private final CollectionService collectionService;
 
     @Autowired
-    public UserService(UserRepository userRepo, PasswordUtils passwordUtils) {
+    public UserService(UserRepository userRepo, PasswordUtils passwordUtils, CollectionService collectionService) {
         this.userRepo = userRepo;
         this.passwordUtils = passwordUtils;
+        this.collectionService = collectionService;
     }
 
     public List<UserDTO> findAll() {
@@ -96,12 +98,16 @@ public class UserService {
     public void update(User user) {
         User toSave = userRepo.findById(user.getId()).orElseThrow(ResourceNotFoundException::new);
 
-        //Update each field, CANNOT UPDATE USERNAME OR PASSWORD
+        /*
+            Update each field, CANNOT UPDATE USERNAME OR PASSWORD OR COLLECTIONS
+            Username and Password are login credentials that we should only update through a more secure
+            and specific endpoint.
+            Collections should be Created and Deleted through the collections endpoint, not through a User Update
+         */
         toSave.setFirstName(user.getFirstName());
         toSave.setLastName(user.getLastName());
         toSave.setEmail(user.getEmail());
         toSave.setFavorites(user.getFavorites());
-        toSave.setCollections(user.getCollections());
 
         userRepo.save(user);
     }
