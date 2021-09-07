@@ -18,6 +18,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -30,10 +31,12 @@ public class SecurityAspect {
     private final Logger logger = LoggerFactory.getLogger(SecurityAspect.class);
 
     private final JwtConfig jwtConfig;
+    private final TokenParser parser;
 
     @Autowired
-    public SecurityAspect(JwtConfig jwtConfig) {
+    public SecurityAspect(JwtConfig jwtConfig, TokenParser parser) {
         this.jwtConfig = jwtConfig;
+        this.parser = parser;
     }
 
     @Around("@annotation(com.revature.jash.web.util.security.Secured)")
@@ -45,42 +48,13 @@ public class SecurityAspect {
 
         HttpServletRequest req = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
 
-        Principal principal = parseToken(req).orElseThrow(() -> new AuthenticationException("Request originates from an unauthenticated source."));
+        Principal principal = parser.parseToken(req).orElseThrow(() -> new AuthenticationException("Request originates from an unauthenticated source."));
 
         if (allowedUsers.size() > 0 && !allowedUsers.contains(principal.getUsername())) {
             throw new AuthorizationException("A forbidden request was made by: " + principal.getUsername());
         }
 
         return pjp.proceed();
-
-    }
-
-    public Optional<Principal> parseToken(HttpServletRequest req) {
-
-        try {
-
-            String header = req.getHeader(jwtConfig.getHeader());
-
-            System.out.println("Header value: " + header);
-
-            if (header == null || !header.startsWith(jwtConfig.getPrefix())) {
-                logger.warn("Request originates from an unauthenticated source.");
-                return Optional.empty();
-            }
-
-            String token = header.replaceAll(jwtConfig.getPrefix(), "");
-
-            Claims jwtClaims = Jwts.parser()
-                    .setSigningKey(jwtConfig.getSigningKey())
-                    .parseClaimsJws(token)
-                    .getBody();
-
-            return Optional.of(new Principal(jwtClaims));
-
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return Optional.empty();
-        }
 
     }
 

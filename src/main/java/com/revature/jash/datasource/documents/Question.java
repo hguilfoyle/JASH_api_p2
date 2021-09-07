@@ -1,8 +1,11 @@
 package com.revature.jash.datasource.documents;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Value;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -27,7 +30,9 @@ public class Question {
     @NotBlank(message = "Category cannot be null or blank")
     private String category; // the type of question (comedy , movie , art etc..)
 
-    @NotBlank(message = "difficulty cannot be null or blank")
+    @NotNull(message = "difficulty cannot be null")
+    @Min(0)
+    @Max(4)
     private int value;// (between 0 - 4) this property describes how hard the question is to the average person
 
     private float penaltyValue; // this property denotes the amount of points this question deducts , if answered incorrectly

@@ -8,6 +8,7 @@ import com.revature.jash.datasource.repositories.QuestionRepository;
 import com.revature.jash.datasource.repositories.UserRepository;
 import com.revature.jash.util.exceptions.InvalidRequestException;
 import com.revature.jash.util.exceptions.ResourceNotFoundException;
+import com.revature.jash.web.dtos.Principal;
 import com.revature.jash.web.dtos.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,8 +36,11 @@ public class QuestionService {
             throw new InvalidRequestException("Invalid Question");
         }
 
+        newQuestion = questionRepo.save(newQuestion);
+
         collectionService.addQuestionToCollection(newQuestion);
-        return questionRepo.save(newQuestion);
+
+        return newQuestion;
     }
 
     public Question findQuestionById(String id) {
@@ -51,26 +55,21 @@ public class QuestionService {
     public void deleteById(String id) {
         Question toDelete = questionRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
 
-        //Want to remove the question from all collections storing it
-        List<Collection> withQuestion = collectionRepo.findByQuestionListContaining(toDelete); //Need to test this line!!!
-        for(Collection c : withQuestion) {
-            List<Question> questions = c.getQuestionList();
-            questions.remove(toDelete);
-            c.setQuestionList(questions);
-            collectionRepo.save(c);
-        }
+        Collection owner = collectionRepo.findCollectionById(toDelete.getCollection_id());
+        List<Question> questions = owner.getQuestionList();
+        questions.remove(toDelete);
+        owner.setQuestionList(questions);
+        collectionRepo.save(owner);
 
-        //Want to remove the question from all User collections and favorites as well!!!
-        List<User> usersWithQuestion = userRepo.findByCollectionsContaining(toDelete); //Need to test this line!!!
+        User author = userRepo.findById(owner.getAuthor().getId()).orElseThrow(ResourceNotFoundException::new);
+        List<Collection> collections = author.getCollections();
+        collections.remove(toDelete);
+        author.setCollections(collections);
+        userRepo.save(author);
+
+        List<User> usersWithQuestion = userRepo.findByFavoritesContaining(toDelete); //Need to test this line!!!
         for(User u : usersWithQuestion) {
-            List<Collection> collections = u.getCollections();
-            collections.remove(toDelete);
-            u.setCollections(collections);
-            userRepo.save(u);
-        }
-        usersWithQuestion = userRepo.findByFavoritesContaining(toDelete); //Need to test this line!!!
-        for(User u : usersWithQuestion) {
-            List<Collection> collections = u.getFavorites();
+            collections = u.getFavorites();
             collections.remove(toDelete);
             u.setFavorites(collections);
             userRepo.save(u);

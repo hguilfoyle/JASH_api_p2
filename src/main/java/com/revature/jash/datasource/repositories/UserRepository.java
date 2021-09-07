@@ -19,9 +19,10 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     List<User> findByFavoritesContaining(Collection toDelete);
 
-    //Dont know if these two work
+    //Dont know if this works
     //Want to find Users->Favorites->QuestionList containing toDelete
     List<User> findByFavoritesContaining(Question toDelete);
-    List<User> findByCollectionsContaining(Question toDelete);
+
+    //List<User> findByFavoritesContainingQuestionListContaining(Question toDelete) maybee???
 }
 
