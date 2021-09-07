@@ -54,7 +54,7 @@ public class UserController {
     @PutMapping(value = "{id}", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public User updateUser(@RequestBody @Valid User updatedUser) {
-        userService.update(updatedUser);
+        return userService.update(updatedUser);
     }
 
 }
