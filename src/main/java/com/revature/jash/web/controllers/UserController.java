@@ -50,10 +50,11 @@ public class UserController {
     public void deleteUser(@PathVariable String id) {
         userService.deleteById(id);
     }
-
+    
+    @PutMapping(value = "{id}", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public void updateUser(@RequestBody @Valid User updatedUser) {
-        userService.update(updatedUser);
+    public User updateUser(@RequestBody @Valid User updatedUser) {
+        return userService.update(updatedUser);
     }
 
 }

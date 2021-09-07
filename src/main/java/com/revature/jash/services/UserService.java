@@ -95,7 +95,7 @@ public class UserService {
         userRepo.deleteById(id);
     }
 
-    public void update(User user) {
+    public User update(User user) {
         User toSave = userRepo.findById(user.getId()).orElseThrow(ResourceNotFoundException::new);
 
         /*
@@ -110,7 +110,7 @@ public class UserService {
         toSave.setEmail(user.getEmail());
         toSave.setFavorites(user.getFavorites());
 
-        userRepo.save(user);
+        return userRepo.save(user);
     }
 
     public void addCollection(Collection newCollection) {
