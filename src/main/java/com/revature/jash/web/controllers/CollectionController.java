@@ -23,7 +23,7 @@ public class CollectionController {
         return collectionService.createNewCollection(newCollection);
     }
 
-    @GetMapping(produces = "application/json")
+    @GetMapping(value = "{id}", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public Collection findById(@PathVariable String id) {
         return collectionService.findCollectionById(id);
