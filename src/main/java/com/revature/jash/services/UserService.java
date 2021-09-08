@@ -39,7 +39,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public UserDTO findUserById(String id) {
+    public UserDTO findById(String id) {
 
         if (id == null || id.trim().isEmpty()) {
             throw new InvalidRequestException("Invalid id provided");
@@ -89,7 +89,7 @@ public class UserService {
     }
 
     //This makes me sad, but it should work.
-    public void deleteById(String id) {
+    public void delete(String id) {
         if (id == null || id.trim().isEmpty()) {
             throw new InvalidRequestException("Invalid id provided");
         }

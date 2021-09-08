@@ -42,13 +42,13 @@ public class QuestionController {
         }
 
 
-        return questionService.createNewQuestion(newQuestion);
+        return questionService.create(newQuestion);
     }
 
     @GetMapping(value = "{id}", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public Question findById(@PathVariable String id) {
-        return questionService.findQuestionById(id);
+        return questionService.findById(id);
     }
 
     @DeleteMapping(value = "{id}")
@@ -56,13 +56,13 @@ public class QuestionController {
     public void deleteQuestion(@PathVariable String id, HttpServletRequest req) {
         Principal principal = parser.parseToken(req).orElseThrow(() -> new AuthenticationException("Request originates from an unauthenticated source."));
         String requester = principal.getId();
-        Question toDelete = questionService.findQuestionById(id);
+        Question toDelete = questionService.findById(id);
         String accessed = collectionService.findCollectionById(toDelete.getCollection_id()).getAuthor().getId();
         if(!requester.equals(accessed)) {
             throw new UserForbiddenException("Not allowed to delete Questions that you dont own");
         }
 
-        questionService.deleteById(id);
+        questionService.delete(id);
     }
 
     @PutMapping(value = "{id}", produces = "application/json")

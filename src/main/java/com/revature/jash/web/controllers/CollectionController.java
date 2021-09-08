@@ -37,7 +37,7 @@ public class CollectionController {
     @PostMapping(produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public Collection createCollection(@RequestBody @Valid Collection newCollection){
-        return collectionService.createNewCollection(newCollection);
+        return collectionService.create(newCollection);
     }
 
     @GetMapping(value = "{id}",produces = "application/json")
@@ -56,7 +56,7 @@ public class CollectionController {
             throw new UserForbiddenException("Not allowed to update other Collections that you dont own");
         }
 
-        return collectionService.replaceCollection(updatedCollection);
+        return collectionService.update(updatedCollection);
     }
 
     @DeleteMapping(value = "{id}")
@@ -69,7 +69,7 @@ public class CollectionController {
             throw new UserForbiddenException("Not allowed to delete Collections that you dont own");
         }
 
-        collectionService.deleteById(id);
+        collectionService.delete(id);
     }
 
 }

@@ -31,19 +31,31 @@ public class QuestionService {
         this.userRepo = userRepo;
     }
 
-    public Question createNewQuestion(Question newQuestion) {
-        if(!isValid(newQuestion)) {
-            throw new InvalidRequestException("Invalid Question");
-        }
+    public Question create(Question newQuestion) {
 
         newQuestion = questionRepo.save(newQuestion);
 
-        collectionService.addQuestionToCollection(newQuestion);
+        Collection collection = collectionRepo.findCollectionById(newQuestion.getCollection_id());
+        collection.getQuestionList().add(newQuestion);
+        Collection newCollection = collectionRepo.save(collection);
+        collectionService.updateRI(newCollection);
 
         return newQuestion;
     }
 
-    public Question findQuestionById(String id) {
+    public boolean delete(String id) {
+        Question toDelete = questionRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
+        questionRepo.deleteById(id);
+
+        Collection collection = collectionRepo.findCollectionById(toDelete.getCollection_id());
+        collection.getQuestionList().remove(toDelete);
+        Collection newCollection = collectionRepo.save(collection);
+        collectionService.updateRI(newCollection);
+
+        return true;
+    }
+
+    public Question findById(String id) {
         if (id == null || id.trim().isEmpty()) {
             throw new InvalidRequestException("Invalid id provided");
         }
@@ -52,59 +64,40 @@ public class QuestionService {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
-    public void deleteById(String id) {
-        Question toDelete = questionRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
-
-        Collection owner = collectionRepo.findCollectionById(toDelete.getCollection_id());
-        List<Question> questions = owner.getQuestionList();
-        questions.remove(toDelete);
-        owner.setQuestionList(questions);
-        collectionRepo.save(owner);
-
-        User author = userRepo.findById(owner.getAuthor().getId()).orElseThrow(ResourceNotFoundException::new);
-        System.out.println(author);
-        List<Collection> collections = author.getCollections();
-        for(Collection c : collections) {
-            c.getQuestionList().remove(toDelete);
-        }
-        author.setCollections(collections);
-        userRepo.save(author);
-
-        List<User> usersWithQuestion = userRepo.findByFavoritesContaining(toDelete); //Need to test this line!!!
-        for(User u : usersWithQuestion) {
-            collections = u.getFavorites();
-            for(Collection c : collections) {
-                c.getQuestionList().remove(toDelete);
-            }
-            u.setFavorites(collections);
-            userRepo.save(u);
-        }
-
-        //Finally, delete the question.
-        questionRepo.deleteById(id);
-    }
-
     public Question update(Question question) {
-        Question toSave = questionRepo.findById(question.getId()).orElseThrow(ResourceNotFoundException::new);
-
         /*
             Update each field, CANNOT UPDATE ID or COLLECTION_ID
             ID and Collection_id are immutable
          */
 
-        toSave.setQuestion(question.getQuestion());
-        toSave.setAnswer(question.getAnswer());
-        toSave.setCategory(question.getCategory());
-        toSave.setValue(question.getValue());
-        toSave.setPenaltyValue(question.getPenaltyValue());
-        toSave.setMultiplier(question.getMultiplier());
-        toSave.setHints(question.getHints());
+        Question oldQuestion = questionRepo.findById(question.getId()).orElseThrow(ResourceNotFoundException::new);
+        Question temp = questionRepo.findById(question.getId()).orElseThrow(ResourceNotFoundException::new);
 
-        return questionRepo.save(question);
+        temp.setQuestion(question.getQuestion());
+        temp.setAnswer(question.getAnswer());
+        temp.setCategory(question.getCategory());
+        temp.setValue(question.getValue());
+        temp.setPenaltyValue(question.getPenaltyValue());
+        temp.setMultiplier(question.getMultiplier());
+        temp.setHints(question.getHints());
+
+        //Update Question
+        Question saved = questionRepo.save(temp);
+
+        //Update Collection
+        Collection owner = collectionService.findCollectionById(oldQuestion.getCollection_id());
+        List<Question> questions = owner.getQuestionList();
+        for (Question q : questions) {
+            if(q.getId().equals(oldQuestion.getId())) {
+                questions.remove(q);
+                questions.add(temp);
+            }
+        }
+        owner.setQuestionList(questions);
+        Collection updatedCollection = collectionRepo.save(owner);
+        collectionService.updateRI(updatedCollection);
+
+        return saved;
     }
 
-    //TODO: Implement me
-    private boolean isValid(Question question) {
-        return true;
-    }
 }

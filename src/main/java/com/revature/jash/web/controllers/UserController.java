@@ -45,7 +45,7 @@ public class UserController {
     @GetMapping(value = "{id}", produces = "application/json")
     @Secured(allowedUsers = {})
     public UserDTO getUserById(@PathVariable String id) {
-        return userService.findUserById(id);
+        return userService.findById(id);
     }
 
     @PostMapping(produces = "application/json")
@@ -64,7 +64,7 @@ public class UserController {
             throw new UserForbiddenException("Not allowed to delete other Users");
         }
 
-        userService.deleteById(id);
+        userService.delete(id);
     }
     
     @PutMapping(value = "{id}", produces = "application/json")
