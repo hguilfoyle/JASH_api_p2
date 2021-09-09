@@ -21,6 +21,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.Objects;
 
@@ -80,4 +81,15 @@ public class UserController {
         return userService.update(updatedUser);
     }
 
+    @PostMapping(value="/favorites", produces="application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public void addFavorite(@PathVariable String user_id, @PathVariable String collection_id) {
+        userService.addFavorite(user_id, collection_id);
+    }
+
+    @DeleteMapping(value="/favorites", produces="application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeFavorite(@PathVariable String user_id, @PathVariable String collection_id) {
+        userService.removeFavorite(user_id, collection_id);
+    }
 }

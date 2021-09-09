@@ -100,7 +100,6 @@ public class CollectionService {
         temp.setCategory(updatedCollection.getCategory());
         temp.setDescription(updatedCollection.getDescription());
         temp.setTitle(updatedCollection.getTitle());
-        temp.setQuestionList(updatedCollection.getQuestionList());
 
         updatedCollection = collectionRepo.save(temp);
 
