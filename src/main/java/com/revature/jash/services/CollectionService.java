@@ -35,45 +35,7 @@ public class CollectionService {
                 .collect(Collectors.toList());
     }
 
-    public void addQuestionToCollection(Question question) {
-        Collection collection = collectionRepo.findCollectionById(question.getCollection_id());
-        collection.getQuestionList().add(question);
-        collectionRepo.save(collection);
-
-        //Need to maintain referential integrity
-        //Update the Owner's Collections field with the new Question
-        Collection owner = collectionRepo.findCollectionById(question.getCollection_id());
-        User author = userRepo.findById(owner.getAuthor().getId()).orElseThrow(ResourceNotFoundException::new);
-        List<Collection> collections = author.getCollections();
-        for(Collection c : collections) {
-            if(c.getId().equals(question.getCollection_id())) {
-                List<Question> qList = c.getQuestionList();
-                qList.add(question);
-                c.setQuestionList(qList);
-                break;
-            }
-        }
-        author.setCollections(collections);
-        userRepo.save(author);
-
-        //Update all Users' Favorites with the updated Question
-        List<User> usersWithQuestion = userRepo.findByFavoritesContaining(question); //Need to test this line!!!
-        for(User u : usersWithQuestion) {
-            collections = u.getCollections();
-            for(Collection c : collections) {
-                if(c.getId().equals(question.getCollection_id())) {
-                    List<Question> qList = c.getQuestionList();
-                    qList.add(question);
-                    c.setQuestionList(qList);
-                    break;
-                }
-            }
-            author.setCollections(collections);
-            userRepo.save(author);
-        }
-    }
-
-    public Collection createNewCollection(Collection newCollection) {
+    public Collection create(Collection newCollection) {
         if(!isValid(newCollection)) {
             throw new InvalidRequestException("Invalid Collection");
         }
@@ -91,7 +53,7 @@ public class CollectionService {
     }
 
 
-    public void deleteById(String id) {
+    public void delete(String id) {
         Collection toDelete = collectionRepo.findCollectionById(id);
 
         //Need to remove collection from the Author's collections
@@ -121,15 +83,63 @@ public class CollectionService {
      * @param updatedCollection
      * @return
      */
-    public Collection replaceCollection(Collection updatedCollection) {
+    public Collection update(Collection updatedCollection) {
         if (!isValid(updatedCollection)) {
             throw new InvalidRequestException("Invalid Collection");
         }
 
-        updatedCollection = collectionRepo.save(updatedCollection);
+        /*
+            Update each field, CANNOT UPDATE QUESTION LIST OR AUTHOR
+            Wont allow you to update the Author, that should be self-explanatory
+            Questions should be Created and Deleted through the questions endpoint, not through a Collection Update
+         */
+
+        Collection oldCollection = collectionRepo.findCollectionById(updatedCollection.getId());
+        Collection temp = collectionRepo.findCollectionById(updatedCollection.getId());
+
+        temp.setCategory(updatedCollection.getCategory());
+        temp.setDescription(updatedCollection.getDescription());
+        temp.setTitle(updatedCollection.getTitle());
+
+        updatedCollection = collectionRepo.save(temp);
+
+        updateRI(updatedCollection);
 
         return updatedCollection;
-    }        
+    }
+
+    //Manages Referential Integrity for Collection Updates
+    public void updateRI(Collection updatedCollection) {
+        Collection oldCollection = collectionRepo.findCollectionById(updatedCollection.getId());
+
+        //Need to update collection in the Author's collections
+        User author = userRepo.findById(updatedCollection.getAuthor().getId()).orElseThrow(ResourceNotFoundException::new);
+        List<Collection> collections = author.getCollections();
+        for(Collection c : collections) {
+            if(c.getId().equals(updatedCollection.getId())) {
+                collections.remove(c);
+                collections.add(updatedCollection);
+                break;
+            }
+        }
+        author.setCollections(collections);
+        userRepo.save(author);
+
+        //Need to remove collection from all Users favorites
+        List<User> withFavorite = userRepo.findByFavoritesContaining(oldCollection); //Need to test this line!!!
+        for(User u : withFavorite) {
+            List<Collection> favorites = author.getFavorites();
+            for(Collection c : favorites) {
+                if(c.getId().equals(updatedCollection.getId())) {
+                    favorites.remove(c);
+                    favorites.add(updatedCollection);
+                    break;
+                }
+            }
+            author.setFavorites(favorites);
+            userRepo.save(author);
+        }
+    }
 
     public boolean isUnique(Collection collection) {
         List<Collection> bySameAuthor = collectionRepo.findCollectionByAuthor(collection.getAuthor());

@@ -39,7 +39,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public UserDTO findUserById(String id) {
+    public UserDTO findById(String id) {
 
         if (id == null || id.trim().isEmpty()) {
             throw new InvalidRequestException("Invalid id provided");
@@ -89,7 +89,7 @@ public class UserService {
     }
 
     //This makes me sad, but it should work.
-    public void deleteById(String id) {
+    public void delete(String id) {
         if (id == null || id.trim().isEmpty()) {
             throw new InvalidRequestException("Invalid id provided");
         }
@@ -127,7 +127,6 @@ public class UserService {
         toSave.setFirstName(user.getFirstName());
         toSave.setLastName(user.getLastName());
         toSave.setEmail(user.getEmail());
-        toSave.setFavorites(user.getFavorites());
 
         return userRepo.save(user);
     }
@@ -144,6 +143,30 @@ public class UserService {
 
         author.getCollections().add(newCollection);
         userRepo.save(author);
+    }
+
+    public void addFavorite(String user_id, String collection_id) {
+        User user = userRepo.findById(user_id).orElseThrow(ResourceNotFoundException::new);
+        Collection collection = collectionRepo.findById(collection_id).orElseThrow(ResourceNotFoundException::new);
+
+        List<Collection> favorites = user.getFavorites();
+        if(!favorites.contains(collection)) {
+            favorites.add(collection);
+        }
+        user.setFavorites(favorites);
+        userRepo.save(user);
+    }
+
+    public void removeFavorite(String user_id, String collection_id) {
+        User user = userRepo.findById(user_id).orElseThrow(ResourceNotFoundException::new);
+        Collection collection = collectionRepo.findById(collection_id).orElseThrow(ResourceNotFoundException::new);
+
+        List<Collection> favorites = user.getFavorites();
+        if(favorites.contains(collection)) {
+            favorites.remove(collection);
+        }
+        user.setFavorites(favorites);
+        userRepo.save(user);
     }
 
     public boolean isUsernameAvailable(String username) {

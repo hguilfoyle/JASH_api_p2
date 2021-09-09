@@ -21,6 +21,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,7 +46,7 @@ public class UserController {
     @GetMapping(value = "{id}", produces = "application/json")
     @Secured(allowedUsers = {})
     public UserDTO getUserById(@PathVariable String id) {
-        return userService.findUserById(id);
+        return userService.findById(id);
     }
 
     @PostMapping(produces = "application/json")
@@ -64,7 +65,7 @@ public class UserController {
             throw new UserForbiddenException("Not allowed to delete other Users");
         }
 
-        userService.deleteById(id);
+        userService.delete(id);
     }
     
     @PutMapping(value = "{id}", produces = "application/json")
@@ -80,4 +81,27 @@ public class UserController {
         return userService.update(updatedUser);
     }
 
+    @PostMapping(value="/favorites", produces="application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public void addFavorite(@PathVariable String user_id, @PathVariable String collection_id, HttpServletRequest req) {
+        Principal principal = parser.parseToken(req).orElseThrow(() -> new AuthenticationException("Request originates from an unauthenticated source."));
+        String requester = principal.getId();
+        String accessed = user_id;
+        if(!requester.equals(accessed)) {
+            throw new UserForbiddenException("Not allowed to update other Users");
+        }
+        userService.addFavorite(user_id, collection_id);
+    }
+
+    @DeleteMapping(value="/favorites", produces="application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeFavorite(@PathVariable String user_id, @PathVariable String collection_id, HttpServletRequest req) {
+        Principal principal = parser.parseToken(req).orElseThrow(() -> new AuthenticationException("Request originates from an unauthenticated source."));
+        String requester = principal.getId();
+        String accessed = user_id;
+        if(!requester.equals(accessed)) {
+            throw new UserForbiddenException("Not allowed to update other Users");
+        }
+        userService.removeFavorite(user_id, collection_id);
+    }
 }
