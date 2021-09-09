@@ -9,6 +9,7 @@ import com.revature.jash.web.dtos.Principal;
 import com.revature.jash.web.filters.CorsFilter;
 import com.revature.jash.web.util.security.Secured;
 import com.revature.jash.web.util.security.SecurityAspect;
+import com.revature.jash.web.util.security.TokenGenerator;
 import com.revature.jash.web.util.security.TokenParser;
 import org.springframework.boot.actuate.endpoint.annotation.FilteredEndpoint;
 import org.springframework.context.annotation.ComponentScan;
@@ -31,10 +32,12 @@ public class UserController {
 
     private final UserService userService;
     private final TokenParser parser;
+    private final TokenGenerator tokenGenerator;
 
-    public UserController(UserService userService, TokenParser parser) {
+    public UserController(UserService userService, TokenParser parser, TokenGenerator tokenGenerator) {
         this.userService = userService;
         this.parser = parser;
+        this.tokenGenerator = tokenGenerator;
     }
 
     @GetMapping(produces = "application/json")
@@ -53,7 +56,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public Principal registerNewUser(@RequestBody @Valid User newUser, HttpServletResponse resp) {
         resp.setHeader("Access-Control-Expose-Headers", "Authorization");
-        return new Principal(userService.register(newUser));
+        Principal principal = new Principal(userService.register(newUser));
+        resp.setHeader(tokenGenerator.getJwtHeader(), tokenGenerator.createToken(principal));
+        resp.setHeader("Access-Control-Expose-Headers", "Authorization");
+
+        return principal;
     }
 
     @DeleteMapping(value = "{id}")
