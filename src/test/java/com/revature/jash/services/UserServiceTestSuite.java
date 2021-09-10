@@ -1,6 +1,9 @@
 package com.revature.jash.services;
 
+import com.revature.jash.datasource.documents.Collection;
+import com.revature.jash.datasource.documents.Question;
 import com.revature.jash.datasource.documents.User;
+import com.revature.jash.datasource.repositories.CollectionRepository;
 import com.revature.jash.datasource.repositories.UserRepository;
 import com.revature.jash.util.PasswordUtils;
 import com.revature.jash.util.exceptions.AuthenticationException;
@@ -26,13 +29,15 @@ public class UserServiceTestSuite {
     private UserRepository mockUserRepo;
     private PasswordUtils mockPasswordUtils;
     private UserService mockUserService;
+    private CollectionRepository mockCollectionRepo;
 
     @BeforeEach
     public void beforeEachTest() {
         mockUserRepo = mock(UserRepository.class);
         mockPasswordUtils = mock(PasswordUtils.class);
         mockUserService = mock(UserService.class);
-        sut = new UserService(mockUserRepo, mockPasswordUtils);
+        mockCollectionRepo = mock(CollectionRepository.class);
+        sut = new UserService(mockUserRepo, mockCollectionRepo,  mockPasswordUtils);
     }
 
     @AfterEach
@@ -61,7 +66,7 @@ public class UserServiceTestSuite {
         UserDTO expectedUser = new UserDTO(existingUser);
         when(mockUserRepo.findById(id)).thenReturn(java.util.Optional.of(existingUser));
         //Act
-        UserDTO result = sut.findUserById(id);
+        UserDTO result = sut.findById(id);
         //Assert
         Assertions.assertEquals(result, expectedUser);
         verify(mockUserRepo, times(1)).findById(id);
@@ -76,7 +81,7 @@ public class UserServiceTestSuite {
         UserDTO expectedUser = new UserDTO(existingUser);
         when(mockUserRepo.findById(id)).thenReturn(java.util.Optional.of(existingUser));
         //Act
-         InvalidRequestException e = assertThrows(InvalidRequestException.class, () -> sut.findUserById(id));
+         InvalidRequestException e = assertThrows(InvalidRequestException.class, () -> sut.findById(id));
         //Assert
         assertEquals("Invalid id provided", e.getMessage());
 
@@ -154,7 +159,7 @@ public class UserServiceTestSuite {
     }
 
     @Test
-    public void login_executesSuccesfully_whenGivenValidUsernameAndPassword() {
+    public void login_executesSuccessfully_whenGivenValidUsernameAndPassword() {
        //Arrange
         String username = "username";
         String password = "password";
@@ -173,7 +178,7 @@ public class UserServiceTestSuite {
     }
 
     @Test
-    public void login_throwsExceptiion_whenUsernameOrPasswordIsBlank() {
+    public void login_throwsException_whenUsernameOrPasswordIsBlank() {
         //Arrange
         String username = "";
         String password = "password";
@@ -190,7 +195,7 @@ public class UserServiceTestSuite {
     }
 
     @Test
-    public void login_throwsExceptiion_whenAuthUserDoesNotExist() {
+    public void login_throwsException_whenAuthUserDoesNotExist() {
         //Arrange
         String username = "username";
         String password = "password";
@@ -208,12 +213,178 @@ public class UserServiceTestSuite {
     }
 
     @Test
-    public void deleteById_executesSuccessfully_whenGivenValidID() {
+    public void delete_executesSuccessfully_whenGivenValidID() {
+       //Arrange
         String id = "validId";
-        User validUser = new User("valid","valid","valid","valid@valid","username","password");
-        User expectedUser = new User("valid","valid","valid","valid@valid","username","password");
+        User validUser = new User(id,"valid","valid","valid@valid","username","password");
+        User expectedUser = new User(id,"valid","valid","valid@valid","username","password");
 
+        when(mockUserRepo.findById(id)).thenReturn(java.util.Optional.of(validUser));
+       //Act
+       sut.delete(id);
+       //Arrange
+       verify(mockUserRepo,times(1)).findById(id);
     }
+
+    @Test
+    public void delete_throwExecution_whenGivenInvalidID() {
+        //Arrange
+        String id = "";
+        User validUser = new User(id,"valid","valid","valid@valid","username","password");
+
+        when(mockUserRepo.findById(id)).thenReturn(java.util.Optional.of(validUser));
+        //Act
+        InvalidRequestException e = assertThrows(InvalidRequestException.class,() -> sut.delete(id));
+        //Arrange
+        assertEquals("Invalid id provided", e.getMessage());
+    }
+
+    @Test
+    public void update_executesSuccessfully_whenGivenValidUser() {
+        //arrange
+        User validUser = new User("valid","valid","valid","valid@valid","username","password");
+        User toSaveUser = new User("valid","newvalid","newvalid","newvalid@valid","username","password");
+
+        when(mockUserRepo.findById(validUser.getId())).thenReturn(java.util.Optional.of(validUser));
+        toSaveUser.setFirstName(validUser.getFirstName());
+        toSaveUser.setLastName(validUser.getLastName());
+        toSaveUser.setEmail(validUser.getEmail());
+
+        when(mockUserRepo.save(toSaveUser)).thenReturn(toSaveUser);
+
+        //Act
+        User expectedUser = sut.update(validUser);
+
+        //Arrange
+        Assertions.assertEquals(toSaveUser,expectedUser);
+        verify(mockUserRepo,times(1)).findById(validUser.getId());
+        verify(mockUserRepo,times(1)).save(toSaveUser);
+    }
+
+    /*
+    * Need to figure out how to TEST a FOR LOOP
+    * */
+    @Test
+    public void addCollection_executesSuccessfully_whenGivenValidCollection() {
+        //Arrange
+        User authUser = new User("valid","valid","valid","valid@valid","username","password");
+        Principal validPrincipal = new Principal(authUser);
+        List<Question> validList = new ArrayList<>();
+        Collection validCollection = new Collection("valid","valid", "valid", validPrincipal, "valid",validList);
+
+        when(mockUserRepo.findById(validPrincipal.getId())).thenReturn(java.util.Optional.of(authUser));
+        when(mockUserRepo.save(authUser)).thenReturn(authUser);
+        //Act
+        sut.addCollection(validCollection);
+
+        //Assert
+        verify(mockUserRepo,times(1)).findById(validPrincipal.getId());
+        verify(mockUserRepo, times(1)).save(authUser);
+    }
+
+    @Test
+    public void addFavorite_executesSuccessfully_whenGivenValidUserIdAndCollectionId() {
+        //Arrange
+       String userId = "valid";
+       String collectionId= "valid";
+       List<Question> validList = new ArrayList<>();
+       User validUser = new User(userId,"valid","valid","valid@valid","username","password");
+       Principal validPrincipal = new Principal(validUser);
+       Collection validCollection = new Collection("valid","valid", "valid", validPrincipal, "valid",validList);
+       List<Collection> favorite = validUser.getFavorites();
+
+       when(mockUserRepo.findById(userId)).thenReturn(java.util.Optional.of(validUser));
+       when(mockCollectionRepo.findById(collectionId)).thenReturn(java.util.Optional.of(validCollection));
+
+       validUser.setFavorites(favorite);
+       when(mockUserRepo.save(validUser)).thenReturn(validUser);
+       //Act
+
+      sut.addFavorite(userId, collectionId);
+
+      //Assert
+      verify(mockUserRepo,times(1)).findById(userId);
+      verify(mockCollectionRepo,times(1)).findById(collectionId);
+      verify(mockUserRepo,times(1)).save(validUser);
+    }
+
+    @Test
+    public void removeFavorite_executesSuccessfully_whenGivenValidUserIdAndCollectionId(){
+        //Arrange
+        String userId = "valid";
+        String collectionId= "valid";
+        List<Question> validList = new ArrayList<>();
+        User validUser = new User(userId,"valid","valid","valid@valid","username","password");
+        Principal validPrincipal = new Principal(validUser);
+        Collection validCollection = new Collection("valid","valid", "valid", validPrincipal, "valid",validList);
+        List<Collection> favorite = validUser.getFavorites();
+
+        when(mockUserRepo.findById(userId)).thenReturn(java.util.Optional.of(validUser));
+        when(mockCollectionRepo.findById(collectionId)).thenReturn(java.util.Optional.of(validCollection));
+
+        validUser.setFavorites(favorite);
+        when(mockUserRepo.save(validUser)).thenReturn(validUser);
+        //Act
+
+        sut.removeFavorite(userId, collectionId);
+
+        //Assert
+        verify(mockUserRepo,times(1)).findById(userId);
+        verify(mockCollectionRepo,times(1)).findById(collectionId);
+        verify(mockUserRepo,times(1)).save(validUser);
+    }
+
+    @Test
+    public void isUsernameAvailable_executesSuccessfully_whenGivenValidUsername(){
+        //Arrange
+        String username = "valid";
+        when(mockUserRepo.findUserByUsername(username)).thenReturn(null);
+
+        //Act
+        Boolean result = sut.isUsernameAvailable(username);
+        //Assert
+        Assertions.assertTrue(result);
+        verify(mockUserRepo,times(1)).findUserByUsername(anyString());
+    }
+
+    @Test
+    public void isUsernameAvailable_throwsException_whenGivenAlreadyTakenUsername(){
+        //Arrange
+        String username = "";
+        when(mockUserRepo.findUserByUsername(username)).thenReturn(null);
+
+        //Act
+        InvalidRequestException e = assertThrows(InvalidRequestException.class,() -> sut.isUsernameAvailable(username));
+        //Assert
+        assertEquals("Invalid username value provided!", e.getMessage());
+    }
+
+    @Test
+    public void isEmailAvailable_executesSuccessfully_whenGivenValidUsername(){
+        //Arrange
+        String email = "valid";
+        when(mockUserRepo.findUserByEmail(email)).thenReturn(null);
+
+        //Act
+        Boolean result = sut.isEmailAvailable(email);
+        //Assert
+        Assertions.assertTrue(result);
+        verify(mockUserRepo,times(1)).findUserByEmail(anyString());
+    }
+
+    @Test
+    public void isEmailAvailable_throwsException_whenGivenAlreadyTakenUsername(){
+        //Arrange
+        String email = "";
+        when(mockUserRepo.findUserByEmail(email)).thenReturn(null);
+
+        //Act
+        InvalidRequestException e = assertThrows(InvalidRequestException.class,() -> sut.isEmailAvailable(email));
+        //Assert
+        assertEquals("Invalid email value provided!", e.getMessage());
+    }
+
+
 
     @Test
     public void isUserValid_executesSuccessfully_whenGivenValidUser(){
