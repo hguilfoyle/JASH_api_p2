@@ -65,7 +65,7 @@ public class QuestionController {
         questionService.delete(id);
     }
 
-    @PutMapping(value = "{id}", produces = "application/json")
+    @PutMapping(produces = "application/json", consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public Question updateQuestion(@RequestBody @Valid Question updatedQuestion, HttpServletRequest req) {
         Principal principal = parser.parseToken(req).orElseThrow(() -> new AuthenticationException("Request originates from an unauthenticated source."));
