@@ -172,7 +172,7 @@ public class UserService {
     public boolean isUsernameAvailable(String username) {
 
         if (username == null || username.trim().equals("")) {
-            throw new InvalidRequestException("Invalid email value provided!");
+            throw new InvalidRequestException("Invalid username value provided!");
         }
 
         return (userRepo.findUserByUsername(username) == null);
