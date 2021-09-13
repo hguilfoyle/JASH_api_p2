@@ -90,7 +90,7 @@ public class UserController {
 
     @PostMapping(value="/favorites", produces="application/json")
     @ResponseStatus(HttpStatus.OK)
-    public void addFavorite(@PathVariable String user_id, @PathVariable String collection_id, HttpServletRequest req) {
+    public void addFavorite(@RequestParam String user_id, @RequestParam String collection_id, HttpServletRequest req) {
         Principal principal = parser.parseToken(req).orElseThrow(() -> new AuthenticationException("Request originates from an unauthenticated source."));
         String requester = principal.getId();
         String accessed = user_id;
@@ -102,7 +102,7 @@ public class UserController {
 
     @DeleteMapping(value="/favorites", produces="application/json")
     @ResponseStatus(HttpStatus.OK)
-    public void removeFavorite(@PathVariable String user_id, @PathVariable String collection_id, HttpServletRequest req) {
+    public void removeFavorite(@RequestParam String user_id, @RequestParam String collection_id, HttpServletRequest req) {
         Principal principal = parser.parseToken(req).orElseThrow(() -> new AuthenticationException("Request originates from an unauthenticated source."));
         String requester = principal.getId();
         String accessed = user_id;
