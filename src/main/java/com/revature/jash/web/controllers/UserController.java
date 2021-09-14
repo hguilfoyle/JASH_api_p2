@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/users")
 public class UserController {
 
@@ -86,6 +87,12 @@ public class UserController {
         }
 
         return userService.update(updatedUser);
+    }
+
+    @GetMapping(value="/favorites", produces="application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public String test() {
+        return "HI";
     }
 
     @PostMapping(value="/favorites", produces="application/json")

@@ -150,6 +150,7 @@ public class UserService {
         Collection collection = collectionRepo.findById(collection_id).orElseThrow(ResourceNotFoundException::new);
 
         List<Collection> favorites = user.getFavorites();
+        System.out.println(favorites);
         if(!favorites.contains(collection)) {
             favorites.add(collection);
         }

@@ -13,6 +13,7 @@ import com.revature.jash.web.dtos.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,10 +67,10 @@ public class CollectionService {
         //Need to remove collection from all Users favorites
         List<User> withFavorite = userRepo.findByFavoritesContaining(toDelete); //Need to test this line!!!
         for(User u : withFavorite) {
-            List<Collection> favorites = author.getFavorites();
+            List<Collection> favorites = u.getFavorites();
             favorites.remove(toDelete);
-            author.setFavorites(favorites);
-            userRepo.save(author);
+            u.setFavorites(favorites);
+            userRepo.save(u);
         }
 
         //Finally, delete the collection.
@@ -103,19 +104,20 @@ public class CollectionService {
 
         updatedCollection = collectionRepo.save(temp);
 
-        updateRI(updatedCollection);
+        updateRI(oldCollection, updatedCollection);
 
         return updatedCollection;
     }
 
     //Manages Referential Integrity for Collection Updates
-    public void updateRI(Collection updatedCollection) {
-        Collection oldCollection = collectionRepo.findCollectionById(updatedCollection.getId());
-
+    public void updateRI(Collection oldCollection, Collection updatedCollection) {
         //Need to update collection in the Author's collections
         User author = userRepo.findById(updatedCollection.getAuthor().getId()).orElseThrow(ResourceNotFoundException::new);
         List<Collection> collections = author.getCollections();
-        for(Collection c : collections) {
+
+        //Copy so we can iterate and modify collections at same time
+        List<Collection> copy = author.getCollections();
+        for(Collection c : copy) {
             if(c.getId().equals(updatedCollection.getId())) {
                 collections.remove(c);
                 collections.add(updatedCollection);
@@ -124,21 +126,25 @@ public class CollectionService {
         }
         author.setCollections(collections);
         userRepo.save(author);
+        if(oldCollection != null) {
+            //Need to remove collection from all Users favorites
+            List<User> withFavorite = userRepo.findByFavoritesContaining(oldCollection); //Need to test this line!!!
+            for(User u : withFavorite) {
+                List<Collection> favorites = u.getFavorites();
 
-        //Need to remove collection from all Users favorites
-        List<User> withFavorite = userRepo.findByFavoritesContaining(oldCollection); //Need to test this line!!!
-        for(User u : withFavorite) {
-            List<Collection> favorites = author.getFavorites();
-            for(Collection c : favorites) {
-                if(c.getId().equals(updatedCollection.getId())) {
-                    favorites.remove(c);
-                    favorites.add(updatedCollection);
-                    break;
+                //Copy so we can iterate and modify collections at same time
+                copy = u.getFavorites();
+                for(Collection c : copy) {
+                    if(c.getId().equals(updatedCollection.getId())) {
+                        favorites.remove(c);
+                        favorites.add(updatedCollection);
+                    }
                 }
+                u.setFavorites(favorites);
+                userRepo.save(u);
             }
-            author.setFavorites(favorites);
-            userRepo.save(author);
         }
+
     }
 
     public boolean isUnique(Collection collection) {

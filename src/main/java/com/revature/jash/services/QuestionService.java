@@ -38,7 +38,7 @@ public class QuestionService {
         Collection collection = collectionRepo.findCollectionById(newQuestion.getCollection_id());
         collection.getQuestionList().add(newQuestion);
         Collection newCollection = collectionRepo.save(collection);
-        collectionService.updateRI(newCollection);
+        collectionService.updateRI(null, newCollection);
 
         return newQuestion;
     }
@@ -47,10 +47,11 @@ public class QuestionService {
         Question toDelete = questionRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
         questionRepo.deleteById(id);
 
+        Collection oldCollection = collectionRepo.findCollectionById(toDelete.getCollection_id());
         Collection collection = collectionRepo.findCollectionById(toDelete.getCollection_id());
         collection.getQuestionList().remove(toDelete);
         Collection newCollection = collectionRepo.save(collection);
-        collectionService.updateRI(newCollection);
+        collectionService.updateRI(oldCollection, newCollection);
 
         return true;
     }
@@ -85,6 +86,7 @@ public class QuestionService {
         Question saved = questionRepo.save(temp);
 
         //Update Collection
+        Collection oldCollection = collectionService.findCollectionById(oldQuestion.getCollection_id());
         Collection owner = collectionService.findCollectionById(oldQuestion.getCollection_id());
         List<Question> questions = owner.getQuestionList();
         for (Question q : questions) {
@@ -95,7 +97,7 @@ public class QuestionService {
         }
         owner.setQuestionList(questions);
         Collection updatedCollection = collectionRepo.save(owner);
-        collectionService.updateRI(updatedCollection);
+        collectionService.updateRI(oldCollection, updatedCollection);
 
         return saved;
     }
