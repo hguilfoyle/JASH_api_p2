@@ -157,7 +157,11 @@ public class CollectionService {
         return true;
     }
 
-    private boolean isValid(Collection collection) {
+    public boolean isValid(Collection collection) {
+        if (collection == null) return false;
+        if (collection.getTitle() == null || collection.getTitle().trim().equals("")) return false;
+        if (collection.getCategory() == null || collection.getCategory().trim().equals("")) return false;
+        if (collection.getDescription() == null || collection.getDescription().trim().equals("")) return false;
         return true;
     }
 
