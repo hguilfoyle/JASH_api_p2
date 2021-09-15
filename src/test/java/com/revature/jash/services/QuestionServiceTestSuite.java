@@ -89,7 +89,7 @@ public class QuestionServiceTestSuite {
         sut.delete(id);
         //Assert
         verify(mockQuestionRepo,times(1)).findById(id);
-        verify(mockCollectionRepo, times(1)).findCollectionById(anyString());
+        verify(mockCollectionRepo, times(2)).findCollectionById(anyString());
         verify(mockCollectionRepo,times(1)).save(validCollection);
     }
 
@@ -158,7 +158,7 @@ public class QuestionServiceTestSuite {
         Assertions.assertEquals(result, validNewQuestion);
         verify(mockQuestionRepo, times(2)).findById(id);
         verify(mockQuestionRepo, times(1)).save(validNewQuestion);
-        verify(mockCollectionService, times(1)).findCollectionById(validOldQuestion.getCollection_id());
+        verify(mockCollectionService, times(2)).findCollectionById(validOldQuestion.getCollection_id());
         verify(mockCollectionRepo, times(1)).save(validCollection);
     }
 }

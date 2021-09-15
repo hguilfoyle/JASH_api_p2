@@ -1,19 +1,24 @@
 package com.revature.jash.web.controllers;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.jash.datasource.documents.Question;
-import com.revature.jash.datasource.documents.User;
 import com.revature.jash.services.CollectionService;
 import com.revature.jash.services.QuestionService;
 import com.revature.jash.util.exceptions.AuthenticationException;
+import com.revature.jash.util.exceptions.JServiceFailureException;
 import com.revature.jash.util.exceptions.UserForbiddenException;
 import com.revature.jash.web.dtos.Principal;
 import com.revature.jash.web.util.security.TokenParser;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
 
 /**
  * This Controller is specifically being used for the creation of custom questions by users.*/
@@ -49,6 +54,23 @@ public class QuestionController {
     @ResponseStatus(HttpStatus.OK)
     public Question findById(@PathVariable String id) {
         return questionService.findById(id);
+    }
+
+    @GetMapping(value = "/random", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public String findRandom() {
+        try {
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url("https://jservice.io/api/random")
+                    .build(); // defaults to GET
+
+            Response response = client.newCall(request).execute();
+            String body = response.body().string();
+            return body;
+        } catch (IOException e) {
+            throw new JServiceFailureException("JService is experiencing errors");
+        }
     }
 
     @DeleteMapping(value = "{id}")

@@ -144,7 +144,7 @@ public class CollectionServiceTestSuite {
         validNewCollection.setTitle(validOldCollection.getTitle());
 
         when(mockCollectionRepo.save(validNewCollection)).thenReturn(validNewCollection);
-        mockCollectionService.updateRI(validNewCollection);
+        mockCollectionService.updateRI(validOldCollection, validNewCollection);
         when(mockUserRepository.findById(validUser.getId())).thenReturn(java.util.Optional.of(validUser));
 
         //Act
@@ -152,7 +152,7 @@ public class CollectionServiceTestSuite {
 
         //Assert
         Assertions.assertEquals(result,validNewCollection);
-        verify(mockCollectionRepo, times(3)).findCollectionById(collectionId);
+        verify(mockCollectionRepo, times(2)).findCollectionById(collectionId);
         verify(mockCollectionRepo, times(1)).save(validNewCollection);
         verify(mockUserRepository, times(1)).findById(validUser.getId());
     }
@@ -171,7 +171,7 @@ public class CollectionServiceTestSuite {
         when(mockUserRepository.findById(validUser.getId())).thenReturn(java.util.Optional.of(validUser));
         when(mockUserRepository.save(validUser)).thenReturn(validUser);
         //Act
-        sut.updateRI(validCollection);
+        sut.updateRI(validCollection, validCollection);
 
         //Assert
         verify(mockUserRepository, times(1)).findById(validUser.getId());
