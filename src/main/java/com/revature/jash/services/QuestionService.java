@@ -35,10 +35,11 @@ public class QuestionService {
 
         newQuestion = questionRepo.save(newQuestion);
 
+        Collection oldCollection = collectionRepo.findCollectionById(newQuestion.getCollection_id());
         Collection collection = collectionRepo.findCollectionById(newQuestion.getCollection_id());
         collection.getQuestionList().add(newQuestion);
         Collection newCollection = collectionRepo.save(collection);
-        collectionService.updateRI(null, newCollection);
+        collectionService.updateRI(oldCollection, newCollection);
 
         return newQuestion;
     }

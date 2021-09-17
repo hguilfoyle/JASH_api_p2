@@ -32,8 +32,8 @@ public class Question {
 
     @NotNull(message = "difficulty cannot be null")
     @Min(0)
-    @Max(45)
-    private int value;// (between 0 - 45) this property describes how hard the question is to the average person
+    @Max(2000)
+    private int value;// (between 0 - 2000) this property describes how many points a question is worth
 
     private float penaltyValue; // this property denotes the amount of points this question deducts , if answered incorrectly
     private float multiplier; // (between 0.01 - 3.5) this property is a factor that we can use
