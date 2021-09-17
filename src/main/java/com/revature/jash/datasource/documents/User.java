@@ -26,7 +26,7 @@ public class User {
     @NotBlank(message = "LastName cannot be null or blank")
     private String lastName;
 
-    @Email
+    @Email(message = "Must be a valid email")
     @NotBlank(message = "Email cannot be null or blank")
     private String email;
 
