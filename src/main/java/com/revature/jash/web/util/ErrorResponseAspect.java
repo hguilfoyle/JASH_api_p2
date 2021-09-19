@@ -47,6 +47,7 @@ public class ErrorResponseAspect {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse MethodArgumentNotValid(MethodArgumentNotValidException e) {return new ErrorResponse(400, "Must be a valid email"); }
+    public ErrorResponse MethodArgumentNotValid(MethodArgumentNotValidException e) {return new ErrorResponse(400,e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+    }
 }
 
