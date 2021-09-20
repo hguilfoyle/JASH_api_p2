@@ -116,7 +116,7 @@ public class CollectionService {
         List<Collection> collections = author.getCollections();
 
         //Copy so we can iterate and modify collections at same time
-        List<Collection> copy = author.getCollections();
+        List<Collection> copy = collections.stream().map(item -> new Collection(item)).collect(Collectors.toList());
         for(Collection c : copy) {
             if(c.getId().equals(updatedCollection.getId())) {
                 collections.remove(c);
@@ -134,6 +134,7 @@ public class CollectionService {
 
                 //Copy so we can iterate and modify collections at same time
                 copy = u.getFavorites();
+                copy = favorites.stream().map(item -> new Collection(item)).collect(Collectors.toList());
                 for(Collection c : copy) {
                     if(c.getId().equals(updatedCollection.getId())) {
                         favorites.remove(c);

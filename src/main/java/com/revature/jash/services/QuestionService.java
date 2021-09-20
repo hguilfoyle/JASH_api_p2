@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionService {
@@ -89,13 +90,19 @@ public class QuestionService {
         //Update Collection
         Collection oldCollection = collectionService.findCollectionById(oldQuestion.getCollection_id());
         Collection owner = collectionService.findCollectionById(oldQuestion.getCollection_id());
+
+        //Copy so we can iterate and modify collections at same time
         List<Question> questions = owner.getQuestionList();
-        for (Question q : questions) {
+        List<Question> iterated = questions.stream().map(item -> new Question(item)).collect(Collectors.toList());
+        System.out.println("HERE");
+        for (Question q : iterated) {
             if(q.getId().equals(oldQuestion.getId())) {
+                System.out.println("CHECKING " + q.getQuestion());
                 questions.remove(q);
                 questions.add(temp);
             }
         }
+        System.out.println("DONE");
         owner.setQuestionList(questions);
         Collection updatedCollection = collectionRepo.save(owner);
         collectionService.updateRI(oldCollection, updatedCollection);

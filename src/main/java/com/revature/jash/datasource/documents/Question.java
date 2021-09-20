@@ -52,5 +52,16 @@ public class Question {
         this.hints = hints;
     }
 
+    public Question(Question toCopy) {
+        this.id = toCopy.id;
+        this.collection_id = toCopy.collection_id;
+        this.question = toCopy.question;
+        this.answer = toCopy.answer;
+        this.category = toCopy.category;
+        this.value = toCopy.value;
+        this.penaltyValue = toCopy.penaltyValue;
+        this.multiplier = toCopy.multiplier;
+        this.hints = toCopy.hints;
+    }
 }
 

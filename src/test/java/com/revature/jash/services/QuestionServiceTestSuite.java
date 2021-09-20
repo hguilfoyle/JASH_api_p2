@@ -63,7 +63,7 @@ public class QuestionServiceTestSuite {
         //Assert
         Assertions.assertEquals(result, validQuestion);
         verify(mockQuestionRepo,times(1)).save(validQuestion);
-        verify(mockCollectionRepo, times(1)).findCollectionById(anyString());
+        verify(mockCollectionRepo, times(2)).findCollectionById(anyString());
         verify(mockCollectionRepo,times(1)).save(validCollection);
     }
 

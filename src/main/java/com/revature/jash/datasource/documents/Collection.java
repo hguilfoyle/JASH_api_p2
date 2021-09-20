@@ -9,7 +9,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Holds sets of questions
@@ -46,4 +48,22 @@ public class Collection {
         this.questionList = questionList;
     }
 
+    public Collection(Collection toCopy) {
+        this.id = toCopy.id;
+        this.title = toCopy.title;
+        this.category = toCopy.category;
+        this.author = toCopy.author;
+        this.description = toCopy.description;
+        this.questionList = cloneQuestions(toCopy.questionList);
+    }
+
+    public List<Question> cloneQuestions(List<Question> toCopy) {
+        List<Question> result = new ArrayList<Question>();
+
+        for(Question q : toCopy) {
+            result.add(new Question(q));
+        }
+
+        return result;
+    }
 }
