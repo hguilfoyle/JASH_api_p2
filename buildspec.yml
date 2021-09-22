@@ -6,18 +6,16 @@ phases:
       java: corretto8
   pre_build:
     commands:
-
+      - aws s3 cp s3://ahjsp2/application.yml ./src/main/resources/application.yml
   build:
     commands:
       - echo Build started on `date`
       - mvn package
-      - mv target/*.war ./Project_2.war
   post_build:
     commands:
       - echo Build completed on `date`
-      - unzip Project_2.war -d artifact/
-      - mv artifact/WEB-INF WEB-INF
+      - mvn package
 artifacts:
   files:
-    - WEB-INF/**/*
-  name: artifact
+    - target/jash-1.0-SNAPSHOT.jar
+  discard-paths: yes

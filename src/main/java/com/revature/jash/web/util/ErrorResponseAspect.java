@@ -3,8 +3,10 @@ package com.revature.jash.web.util;
 import com.revature.jash.util.exceptions.InvalidRequestException;
 import com.revature.jash.util.exceptions.ResourceNotFoundException;
 import com.revature.jash.util.exceptions.ResourcePersistenceException;
+import com.revature.jash.util.exceptions.UserForbiddenException;
 import com.revature.jash.web.dtos.ErrorResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -12,6 +14,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ErrorResponseAspect {
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleUserForbiddenException(UserForbiddenException e) {
+        return new ErrorResponse(403, e.getMessage());
+    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -37,5 +45,9 @@ public class ErrorResponseAspect {
         return new ErrorResponse(500, e.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse MethodArgumentNotValid(MethodArgumentNotValidException e) {return new ErrorResponse(400,e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+    }
 }
 
